@@ -1,0 +1,7 @@
+[backend]
+name = "backend"
+directory = "backend"
+
+[frontend]
+name = "frontend"
+directory = "frontend"
