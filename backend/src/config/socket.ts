@@ -72,7 +72,7 @@ export const setupSocketIO = (httpServer: Server) => {
         username: username,
         timestamp: new Date().toISOString(),
       });
-      console.log(`User disconnected: ${username}`);
+      //console.log(`User disconnected: ${username}`);
     });
   });
 

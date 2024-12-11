@@ -1,4 +1,4 @@
-import mongoose, { Document, Schema } from "mongoose";
+import mongoose, { Schema, Document } from "mongoose";
 import bcrypt from "bcryptjs";
 
 export interface IUser extends Document {
@@ -16,8 +16,8 @@ const userSchema = new Schema(
       type: String,
       required: true,
       unique: true,
-      lowercase: true,
       trim: true,
+      lowercase: true,
     },
     username: {
       type: String,
@@ -32,6 +32,15 @@ const userSchema = new Schema(
   },
   {
     timestamps: true,
+    toJSON: {
+      transform: function (doc, ret) {
+        ret.id = ret._id.toString();
+        delete ret._id;
+        delete ret.__v;
+        delete ret.password;
+        return ret;
+      },
+    },
   }
 );
 

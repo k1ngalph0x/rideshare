@@ -1,12 +1,16 @@
 import { AuthenticationError, UserInputError } from "apollo-server-express";
 import { User } from "../../models/User";
 import { generateToken } from "../../utils/auth";
+import { redisService } from "../../services/redis.service";
 
 export const userResolvers = {
   Query: {
     me: async (_: any, __: any, { user }) => {
       if (!user) throw new AuthenticationError("Not authenticated");
-      return User.findById(user.id);
+
+      const userData = await User.findById(user.id);
+      if (!userData) throw new UserInputError("User not found");
+      return userData;
     },
 
     getUser: async (_: any, { id }: { id: string }) => {
@@ -16,7 +20,7 @@ export const userResolvers = {
     },
 
     getUsers: async () => {
-      return User.find();
+      return await User.find();
     },
   },
 
@@ -37,7 +41,16 @@ export const userResolvers = {
 
       const token = generateToken(user);
 
-      return { token, user };
+      return {
+        token,
+        user: {
+          id: user.id,
+          email: user.email,
+          username: user.username,
+          createdAt: user.createdAt,
+          updatedAt: user.updatedAt,
+        },
+      };
     },
 
     login: async (_: any, { input }: { input: any }) => {
@@ -55,15 +68,28 @@ export const userResolvers = {
 
       const token = generateToken(user);
 
-      return { token, user };
+      return {
+        token,
+        user: {
+          id: user.id,
+          email: user.email,
+          username: user.username,
+          createdAt: user.createdAt,
+          updatedAt: user.updatedAt,
+        },
+      };
     },
 
-    updateUser: async (_: any, { input }: { input: any }, { user }) => {
+    updateUser: async (
+      _: any,
+      { username }: { username: string },
+      { user }
+    ) => {
       if (!user) throw new AuthenticationError("Not authenticated");
 
       const updatedUser = await User.findByIdAndUpdate(
         user.id,
-        { ...input },
+        { username },
         { new: true }
       );
 
@@ -73,7 +99,6 @@ export const userResolvers = {
 
     deleteUser: async (_: any, __: any, { user }) => {
       if (!user) throw new AuthenticationError("Not authenticated");
-
       await User.findByIdAndDelete(user.id);
       return true;
     },

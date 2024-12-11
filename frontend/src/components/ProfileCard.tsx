@@ -4,22 +4,6 @@ interface ProfileCardProps {
   user?: User | null;
 }
 
-// const formatDate = (dateString: string): string => {
-//   try {
-//     const date = new Date(dateString);
-//     if (isNaN(date.getTime())) {
-//       return "Date not available";
-//     }
-//     return date.toLocaleDateString("en-US", {
-//       year: "numeric",
-//       month: "long",
-//       day: "numeric",
-//     });
-//   } catch {
-//     return "Date not available";
-//   }
-// };
-
 export const ProfileCard = ({ user }: ProfileCardProps) => {
   if (!user) {
     return (
