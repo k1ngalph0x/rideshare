@@ -4,10 +4,11 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "start": "vite preview --host",
+    "build": "tsc && vite build",
+    "dev": "vite"
   },
   "dependencies": {
     "@apollo/client": "^3.12.2",
