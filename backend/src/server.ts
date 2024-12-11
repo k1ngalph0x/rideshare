@@ -11,6 +11,7 @@ import dotenv from "dotenv";
 import { typeDefs } from "./graphql/schemas";
 import { resolvers } from "./graphql/resolvers";
 import { authMiddleware, AuthRequest } from "./middleware/auth.middleware";
+import { setupSocketIO } from "./config/socket";
 
 dotenv.config();
 
@@ -21,6 +22,7 @@ async function startServer() {
   app.use(authMiddleware);
 
   const httpServer = createServer(app);
+  const io = setupSocketIO(httpServer);
 
   const schema = makeExecutableSchema({
     typeDefs,
@@ -46,6 +48,7 @@ async function startServer() {
     schema,
     context: ({ req }: { req: AuthRequest }) => ({
       user: req.user || null,
+      io,
     }),
     plugins: [
       ApolloServerPluginDrainHttpServer({ httpServer }),
