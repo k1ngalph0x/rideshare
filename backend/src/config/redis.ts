@@ -3,7 +3,7 @@ import { Redis, RedisOptions } from "ioredis";
 const redisOptions: RedisOptions = {
   host: process.env.REDIS_HOST || "localhost",
   port: Number(process.env.REDIS_PORT) || 6379,
-  username: "user",
+  username: "default",
   password: process.env.REDIS_PASSWORD,
   retryStrategy: (times: number) => {
     console.log(`Redis retry attempt ${times}`);
