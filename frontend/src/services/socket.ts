@@ -3,8 +3,10 @@ import { io, Socket } from "socket.io-client";
 class SocketService {
   private socket: Socket | null = null;
 
+  API_URL = import.meta.env.VITE_API_URL || "http://localhost:4000";
+
   connect(token: string) {
-    this.socket = io("http://localhost:4000", {
+    this.socket = io(this.API_URL, {
       auth: { token },
     });
 
