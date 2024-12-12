@@ -1,7 +1,12 @@
-[backend]
+[build]
+builder = "dockerfile"
+
+[[services]]
 name = "backend"
+dockerfile = "backend/Dockerfile"
 directory = "backend"
 
-[frontend]
+[[services]]
 name = "frontend"
+dockerfile = "frontend/Dockerfile"
 directory = "frontend"
