@@ -1,0 +1,69 @@
+openapi: 3.0.0
+info:
+  title: RideShare GraphQL API
+  version: 1.0.0
+  description: GraphQL API with real-time features for a ride-sharing platform
+
+servers:
+  - url: http://localhost:4000
+    description: Development server
+
+paths:
+  /graphql:
+    post:
+      summary: GraphQL endpoint
+      description: Main endpoint for GraphQL queries and mutations
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                query:
+                  type: string
+                  example: "query { me { id username email } }"
+                variables:
+                  type: object
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+        email:
+          type: string
+        username:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+security:
+  - BearerAuth: []
+
+tags:
+  - name: Queries
+    description: GraphQL queries
+  - name: Mutations
+    description: GraphQL mutations
+  - name: Subscriptions
+    description: Real-time subscriptions
