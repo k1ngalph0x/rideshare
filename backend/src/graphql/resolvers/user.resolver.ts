@@ -2,6 +2,7 @@ import { AuthenticationError, UserInputError } from "apollo-server-express";
 import { User } from "../../models/User";
 import { generateToken } from "../../utils/auth";
 import { redisService } from "../../services/redis.service";
+import bcrypt from "bcryptjs";
 
 export const userResolvers = {
   Query: {
@@ -80,21 +81,69 @@ export const userResolvers = {
       };
     },
 
-    updateUser: async (
-      _: any,
-      { username }: { username: string },
-      { user }
-    ) => {
+    // updateUser: async (
+    //   _: any,
+    //   { username }: { username: string },
+    //   { user }
+    // ) => {
+    //   if (!user) throw new AuthenticationError("Not authenticated");
+
+    //   const updatedUser = await User.findByIdAndUpdate(
+    //     user.id,
+    //     { username },
+    //     { new: true }
+    //   );
+
+    //   if (!updatedUser) throw new UserInputError("User not found");
+    //   return updatedUser;
+    // },
+    updateUser: async (_: any, { input }: { input: any }, { user }) => {
       if (!user) throw new AuthenticationError("Not authenticated");
 
-      const updatedUser = await User.findByIdAndUpdate(
-        user.id,
-        { username },
-        { new: true }
-      );
+      // First fetch the current user with the model instance methods
+      const currentUser = await User.findById(user.id);
+      if (!currentUser) throw new UserInputError("User not found");
 
-      if (!updatedUser) throw new UserInputError("User not found");
-      return updatedUser;
+      const updateData: any = {};
+
+      // Handle basic field updates
+      if (input.username) updateData.username = input.username;
+      if (input.email) updateData.email = input.email;
+
+      // Handle password update
+      if (input.newPassword) {
+        if (!input.currentPassword) {
+          throw new UserInputError(
+            "Current password is required to set new password"
+          );
+        }
+
+        // Use the model instance for password comparison
+        const validPassword = await currentUser.comparePassword(
+          input.currentPassword
+        );
+        if (!validPassword) {
+          throw new UserInputError("Current password is incorrect");
+        }
+
+        const salt = await bcrypt.genSalt(10);
+        updateData.password = await bcrypt.hash(input.newPassword, salt);
+      }
+
+      try {
+        const updatedUser = await User.findByIdAndUpdate(user.id, updateData, {
+          new: true,
+          runValidators: true,
+        });
+
+        if (!updatedUser) throw new UserInputError("User not found");
+        return updatedUser;
+      } catch (error) {
+        if (error.code === 11000) {
+          throw new UserInputError("Email already in use");
+        }
+        throw error;
+      }
     },
 
     deleteUser: async (_: any, __: any, { user }) => {

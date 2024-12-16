@@ -61,6 +61,14 @@ export const userTypeDefs = `
     password: String!
   }
 
+  input UpdateUserInput {
+    username: String
+    email: String
+    currentPassword: String
+    newPassword: String
+  }
+
+
   input LoginInput {
     email: String!
     password: String!
@@ -75,7 +83,7 @@ export const userTypeDefs = `
   type Mutation {
     register(input: RegisterInput!): AuthPayload!
     login(input: LoginInput!): AuthPayload!
-    updateUser(username: String!): User!
+    updateUser(input: UpdateUserInput!): User!
     deleteUser: Boolean!
   }
 `;

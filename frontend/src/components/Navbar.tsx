@@ -25,6 +25,12 @@ export const Navbar = () => {
                 >
                   Dashboard
                 </Link>
+                <Link
+                  to="/profile"
+                  className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
+                >
+                  Profile
+                </Link>
                 <button
                   onClick={logout}
                   className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
