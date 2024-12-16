@@ -100,17 +100,26 @@ export const userResolvers = {
     updateUser: async (_: any, { input }: { input: any }, { user }) => {
       if (!user) throw new AuthenticationError("Not authenticated");
 
-      // First fetch the current user with the model instance methods
       const currentUser = await User.findById(user.id);
       if (!currentUser) throw new UserInputError("User not found");
 
       const updateData: any = {};
 
-      // Handle basic field updates
-      if (input.username) updateData.username = input.username;
-      if (input.email) updateData.email = input.email;
+      if (input.email && input.email !== currentUser.email) {
+        const emailExists = await User.findOne({
+          email: input.email,
+          _id: { $ne: user.id },
+        });
+        if (emailExists) {
+          throw new UserInputError("Email already in use");
+        }
+        updateData.email = input.email;
+      }
 
-      // Handle password update
+      if (input.username) {
+        updateData.username = input.username;
+      }
+
       if (input.newPassword) {
         if (!input.currentPassword) {
           throw new UserInputError(
@@ -118,7 +127,6 @@ export const userResolvers = {
           );
         }
 
-        // Use the model instance for password comparison
         const validPassword = await currentUser.comparePassword(
           input.currentPassword
         );
@@ -131,17 +139,23 @@ export const userResolvers = {
       }
 
       try {
-        const updatedUser = await User.findByIdAndUpdate(user.id, updateData, {
-          new: true,
-          runValidators: true,
-        });
+        if (Object.keys(updateData).length > 0) {
+          const updatedUser = await User.findByIdAndUpdate(
+            user.id,
+            updateData,
+            {
+              new: true,
+              runValidators: true,
+            }
+          );
 
-        if (!updatedUser) throw new UserInputError("User not found");
-        return updatedUser;
-      } catch (error) {
-        if (error.code === 11000) {
-          throw new UserInputError("Email already in use");
+          if (!updatedUser) throw new UserInputError("User not found");
+          return updatedUser;
         }
+
+        return currentUser; // Return current user if no changes
+      } catch (error) {
+        console.error("Update error:", error);
         throw error;
       }
     },
