@@ -1,5 +1,5 @@
 // pages/Profile.tsx
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useQuery, useMutation, gql } from "@apollo/client";
 //import { useAuth } from "../hooks/useAuth";
 
@@ -39,8 +39,17 @@ export const Profile = () => {
   });
   const [message, setMessage] = useState({ type: "", content: "" });
 
-  // Initialize form data when profile is loaded
-  useState(() => {
+  //   useState(() => {
+  //     if (data?.me) {
+  //       setFormData((prev) => ({
+  //         ...prev,
+  //         username: data.me.username,
+  //         email: data.me.email,
+  //       }));
+  //     }
+  //   }, [data]);
+
+  useEffect(() => {
     if (data?.me) {
       setFormData((prev) => ({
         ...prev,
